@@ -7,14 +7,30 @@ import {
   ShoppingCartIcon,
 } from "@heroicons/react/outline";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
+import { selectItems } from "../slices/basketSlice";
 
 const Header = () => {
+  const items = useSelector(selectItems);
+
+  const router = useRouter();
+  const session = useSession();
+  const isAuthenticated = session?.status === "authenticated";
+
+  const navigateCheckout = () => {
+    isAuthenticated ? router.push("/checkout") : signIn();
+  };
+
   return (
     <header>
       {/* Top Nav */}
       <div className="flex items-center bg-amazon_blue p-1 flex-grow py-2">
         {/* Logo */}
-        <div className="mt-2 flex items-center flex-grow sm:flex-grow-0">
+        <div
+          className="mt-2 flex items-center flex-grow sm:flex-grow-0"
+          onClick={() => router.push("/")}
+        >
           <Image
             src={logo}
             width={150}
@@ -34,8 +50,11 @@ const Header = () => {
         {/* Right Side */}
         <div className="text-white flex items-center text-xs space-x-6 mx-6 whitespace-nowrap">
           {/* Account & Lists */}
-          <div onClick={signIn} className="flex-1 link ">
-            <p>Hello Gerard C. Saperas</p>
+          <div
+            onClick={!isAuthenticated ? signIn : signOut}
+            className="flex-1 link "
+          >
+            {isAuthenticated ? <p>Hello Gerard C. Saperas</p> : <p>Sign in</p>}
             <p className="font-extrabold md:text-sm">Account & Lists</p>
           </div>
           {/* Returns & Orders */}
@@ -44,9 +63,12 @@ const Header = () => {
             <p className="font-extrabold md:text-sm">& Orders</p>
           </div>
           {/* Basket */}
-          <div className="flex-1 link relative flex items-center">
+          <div
+            onClick={() => navigateCheckout()}
+            className="flex-1 link relative flex items-center"
+          >
             <span className="absolute top-0 lg:right-10 right-0 bg-yellow-400 h-4 w-4 text-center rounded-full text-black font-bold">
-              4
+              {items.length}
             </span>
             <ShoppingCartIcon className="h-10" />
             <p className="hidden lg:block font-extrabold text-sm mt-2">

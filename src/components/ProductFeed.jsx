@@ -8,7 +8,7 @@ const ProductFeed = ({ products }) => {
       ))}
 
       <img
-        className="md:col-span-full"
+        className="w-full md:col-span-full"
         src="https://links.papareact.com/dyz"
         alt=""
       />
