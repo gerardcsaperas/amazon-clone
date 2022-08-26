@@ -7,6 +7,12 @@ import { useSelector } from "react-redux";
 import { selectItems, selectTotal } from "../slices/basketSlice";
 import CheckoutProduct from "../components/CheckoutProduct";
 import Currency from "react-currency-formatter";
+import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
+// Make sure to call `loadStripe` outside of a component’s render to avoid
+// recreating the `Stripe` object on every render.
+const stripePromise = loadStripe(process.env.stripe_public_key);
+
 const Checkout = () => {
   const totalPrice = useSelector(selectTotal);
   const items = useSelector(selectItems);
@@ -19,6 +25,26 @@ const Checkout = () => {
       router.push("/");
     }
   }, []);
+
+  const createCheckoutSession = async () => {
+    try {
+      const stripe = await stripePromise;
+      const checkoutSession = await axios.post("/api/checkout-sessions", {
+        items,
+        email: session.data.user.email,
+      });
+
+      const result = await stripe.redirectToCheckout({
+        sessionId: checkoutSession.data.id,
+      });
+
+      if (result.error) {
+        alert(result.error);
+      }
+    } catch (e) {
+      alert(e.message);
+    }
+  };
 
   return (
     <div className="bg-gray-100">
@@ -57,7 +83,9 @@ const Checkout = () => {
                 <Currency quantity={totalPrice} currency="EUR" />
               </span>
             </h2>
-            <button className="button">Checkout</button>
+            <button onClick={createCheckoutSession} className="button">
+              Checkout
+            </button>
           </div>
         )}
       </main>
