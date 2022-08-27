@@ -32,3 +32,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# firebase service key
+firebase-permissions.json
