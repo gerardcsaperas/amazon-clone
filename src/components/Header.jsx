@@ -22,6 +22,10 @@ const Header = () => {
     isAuthenticated ? router.push("/checkout") : signIn();
   };
 
+  const navigateOrders = () => {
+    isAuthenticated ? router.push("/orders") : signIn();
+  };
+
   return (
     <header>
       {/* Top Nav */}
@@ -58,7 +62,7 @@ const Header = () => {
             <p className="font-extrabold md:text-sm">Account & Lists</p>
           </div>
           {/* Returns & Orders */}
-          <div className="flex-1 link ">
+          <div className="flex-1 link " onClick={navigateOrders}>
             <p>Returns</p>
             <p className="font-extrabold md:text-sm">& Orders</p>
           </div>
